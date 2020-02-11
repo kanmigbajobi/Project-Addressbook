@@ -16,6 +16,16 @@ node{
        withDockerRegistry(credentialsId: 'ecr:eu-west-2:AWSSecretKeysAndAccessKeys', url: 'https://807395240887.dkr.ecr.eu-west-2.amazonaws.com/test3') {
            sh label: '', script: 'docker tag test3:latest 807395240887.dkr.ecr.eu-west-2.amazonaws.com/test3:latest'
            sh label: '', script: 'docker push 807395240887.dkr.ecr.eu-west-2.amazonaws.com/test3:latest'
-        }
-   }
+   
+   stage('Update Service'){
+      withCredentials([[
+      $class: 'AmazonWebServicesCredentialsBinding',
+      accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+      credentialsId: 'AWSSecretKeysAndAccessKeys',
+      secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+      ]]) {
+          sh label: '', script: 'aws ecs update-service --cluster new-project-2 --service new-project-2  --force-new-deployment --region eu-west-2'
+     }
+  }
 }
+
